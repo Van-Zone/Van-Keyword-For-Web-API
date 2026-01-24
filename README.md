@@ -191,7 +191,7 @@ API_PORT = 8889           # 监听端口
 
 1. **安装依赖**:
    ```bash
-   pip install -r requirements.txt
+   pip install fastapi uvicorn httpx pydantic
    ```
 
 2. **配置权限**:
@@ -203,7 +203,7 @@ API_PORT = 8889           # 监听端口
    ```
 
 4. **验证服务**:
-   访问 `http://localhost:8889/docs` 查看API文档
+   访问 `http://localhost:8889/docs` 或 `[公开文档](http://white.oneplus.xin/api/dosc.html)` 查看API文档
 
 ## 故障排除
 
