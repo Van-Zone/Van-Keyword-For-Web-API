@@ -14,6 +14,15 @@ VanBot词库API是一个基于FastAPI的HTTP服务，提供关键词词库的查
 - **变量支持**：支持`[n.数字]`格式的变量替换
 - **CQ码兼容**：自动转换常见CQ码格式
 
+### 高级功能（新增）
+- **完整消息解码系统**：支持复杂变量替换和多媒体消息处理
+- **时间变量系统**：`(Y)`, `(M)`, `(D)`, `(h)`, `(m)`, `(s)` 时间变量
+- **数学运算**：支持 `(+1+2)`, `(+2*3/4)` 等数学表达式
+- **随机数生成**：`(1-100)` 生成随机数
+- **冷却时间系统**：`(60~)` 设置冷却时间，基于用户ID和词条ID
+- **条件判断**：`{a>b}` 数值比较和字符串判断
+- **分句发送**：`(-5-)` 分句发送语法检测
+
 ### 技术特性
 - **RESTful API**：基于FastAPI的标准HTTP接口
 - **Token验证**：Bearer Token双重验证机制
@@ -63,7 +72,37 @@ Van_keyword_data/
 }
 ```
 
-#### 2. 添加词条
+#### 2. 消息解码（新增）
+**POST** `/api/v1/keyword`
+```json
+{
+  "action": "decode",
+  "botid": 123456,
+  "userid": 789012,
+  "text": "你好[qq]！现在是(Y)年(M)月(D)日 [image.http://example.com/test.jpg]",
+  "event_data": {
+    "user_id": 789012,
+    "group_id": 987654,
+    "self_id": 123456
+  },
+  "lexicon_id": 1001,    // 可选，用于冷却
+  "lexicon_n": 50,       // 可选，词库词条数
+  "cool_config": true,   // 可选，是否启用冷却
+  "token": "API_TOKEN"
+}
+```
+
+#### 3. 消息转码（新增）
+**POST** `/api/v1/keyword`
+```json
+{
+  "action": "transcode",
+  "text": "[CQ:image,url=http://example.com/img.jpg]",
+  "token": "API_TOKEN"
+}
+```
+
+#### 4. 添加词条
 ```json
 {
   "action": "add",
@@ -76,7 +115,7 @@ Van_keyword_data/
 }
 ```
 
-#### 3. 删除词条
+#### 5. 删除词条
 ```json
 {
   "action": "remove",
@@ -87,16 +126,84 @@ Van_keyword_data/
 }
 ```
 
-#### 4. 管理回复选项
+#### 6. 管理回复选项
 - `add_r`: 为已有词条添加回复选项
 - `remove_r`: 删除词条的某个回复选项
 
-#### 5. 其他功能
+#### 7. 其他功能
 - `get_config`: 获取系统配置
 - `search`: 搜索关键词
 - `list`: 列出所有词条
 - `count`: 统计词条数量
 - `test`: 测试接口连通性
+
+#### 8. 示例接口（新增）
+**GET** `/api/v1/examples` - 获取API使用示例
+
+## 变量系统（增强）
+
+### 基础变量
+- `[qq]` - 用户QQ号
+- `[name]` - 用户昵称
+- `[群号]` - 群组ID
+- `[词条id]` - 词条ID
+- `[词汇量]` - 词库词条数
+- `[当前词库]` - 当前使用的词库名称
+- `[n.1]`~`[n.5]` - 匹配变量占位符
+
+### 时间变量（新增）
+| 变量 | 说明 | 示例输出 |
+|------|------|----------|
+| `(Y)` | 年份 | 2024 |
+| `(M)` | 月份 | 12 |
+| `(D)` | 日期 | 25 |
+| `(h)` | 小时 | 14 |
+| `(m)` | 分钟 | 30 |
+| `(s)` | 秒数 | 45 |
+
+**示例**：`现在是(Y)年(M)月(D)日 (h):(m):(s)` → `现在是2024年12月25日 14:30:45`
+
+### 数学运算（新增）
+支持复杂的数学表达式计算：
+- `(+1+2)` → `3`
+- `(+2*3/4)` → `1.5`
+- `(+10-5*2)` → `0`
+- 支持 `×` (乘法) 和 `÷` (除法) 符号
+- 支持浮点数运算
+
+### 随机数生成（新增）
+- `(1-100)` → 生成1到100的随机整数
+- 支持多个随机数同时生成
+- 示例：`你的幸运数字是(1-10)` → `你的幸运数字是7`
+
+### 冷却时间系统（增强）
+- `(60~)` → 设置60秒冷却时间
+- `(0~)` → 冷却到当天午夜（0点）
+- 基于用户ID和词条ID的冷却检查
+- 可自定义冷却中回复消息
+
+### 条件判断（新增）
+- `{a>b}` → 数值比较（大于）
+- `{a<b}` → 数值比较（小于）
+- `{a=b}` → 相等判断（支持数字和字符串）
+- 判断失败时可返回自定义回复
+
+## 多媒体消息处理（增强）
+
+### 支持的消息类型：
+
+| 类型 | 内部格式 | CQ码格式 | 说明 |
+|------|----------|----------|------|
+| 文本 | `[text.内容]` | `[CQ:text,content=内容]` | 文本消息 |
+| 图片 | `[image.URL]` | `[CQ:image,url=URL]` | 图片消息 |
+| 表情 | `[face.ID]` | `[CQ:face,id=ID]` | 表情ID |
+| @某人 | `[at.QQ号]` | `[CQ:at,qq=QQ号]` | @特定用户 |
+| 回复 | `[reply.消息ID]` | `[CQ:reply,id=消息ID]` | 回复消息 |
+| 视频 | `[video.URL]` | `[CQ:video,url=URL]` | 视频消息 |
+| 语音 | `[record.URL]` | `[CQ:record,url=URL]` | 语音消息 |
+| 音乐 | `[music.标题.URL]` | `[CQ:music,title=标题,url=URL]` | 音乐分享 |
+| 分享 | `[share.URL]` | `[CQ:share,url=URL]` | 链接分享 |
+| JSON | `[json.JSON数据]` | `[CQ:json,data=JSON数据]` | JSON格式消息 |
 
 ## 配置文件
 
@@ -110,6 +217,23 @@ Van_keyword_data/
 2. **模糊匹配 (s=0)**: 消息包含关键词即可
 3. **管理员专用 (s=10)**: 仅管理员可访问
 
+### 新增配置支持
+```python
+# 冷却相关配置
+COOLING_ENABLED = True  # 启用冷却系统
+DEFAULT_COOLING_TIME = 60  # 默认冷却时间（秒）
+
+# 变量替换配置
+ENABLE_VARIABLE_REPLACE = True
+ENABLE_TIME_VARIABLES = True
+ENABLE_MATH_EXPRESSIONS = True
+
+# 多媒体处理配置
+ALLOW_IMAGE_MESSAGES = True
+ALLOW_AUDIO_MESSAGES = True
+MAX_MESSAGE_LENGTH = 5000
+```
+
 ## 使用示例
 
 ### 启动服务
@@ -118,6 +242,8 @@ python Van_keyword.py
 ```
 
 ### API调用示例
+
+#### 基础查询
 ```bash
 # 测试连接
 curl -X POST http://localhost:8889/api/v1/keyword \
@@ -130,6 +256,40 @@ curl -X POST http://localhost:8889/api/v1/keyword \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer {API_TOKEN}" \
   -d '{"action":"query","botid":123456,"userid":789012,"msg":"你好","token":"{API_TOKEN}"}'
+```
+
+#### 高级功能示例（新增）
+```bash
+# 复杂消息解码
+curl -X POST http://localhost:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer API_TOKEN" \
+  -d '{
+    "action": "decode",
+    "botid": 123456,
+    "userid": 789012,
+    "text": "欢迎[qq]！\\n今日日期：(Y)/(M)/(D)\\n随机数：(1-100)\\n数学运算：(+5*3/2)\\n[image.http://example.com/avatar.jpg]",
+    "event_data": {
+      "user_id": 789012,
+      "group_id": 987654,
+      "self_id": 123456,
+      "sender": {
+        "nickname": "小明",
+        "card": "技术宅"
+      }
+    },
+    "token": "API_TOKEN"
+  }'
+
+# CQ码转码
+curl -X POST http://localhost:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer API_TOKEN" \
+  -d '{
+    "action": "transcode",
+    "text": "[CQ:image,url=http://example.com/img.jpg][CQ:at,qq=123456]",
+    "token": "API_TOKEN"
+  }'
 ```
 
 ## 环境要求
@@ -152,12 +312,16 @@ pydantic==2.5.0
 MISTAKE_TURN_TYPE = False  # 是否自动转换中文符号
 API_HOST = "0.0.0.0"       # 监听地址
 API_PORT = 8889           # 监听端口
+ENABLE_ADVANCED_FEATURES = True  # 启用高级功能
+MAX_CACHE_SIZE = 1000      # 缓存大小
+LOG_LEVEL = "INFO"         # 日志级别
 ```
 
 ### 安全设置
 - 自动生成16位随机Token
 - Bearer Token双重验证机制
 - 管理员权限控制
+- Token加密存储
 
 ## 日志系统
 
@@ -167,9 +331,22 @@ API_PORT = 8889           # 监听端口
 - WARN: 警告信息
 - ERROR: 错误信息
 
+### 新增日志类别：
+- `DECODE` - 消息解码日志
+- `VARIABLE` - 变量替换日志
+- `MEDIA` - 多媒体处理日志
+- `COOLING` - 冷却系统日志
+- `MATH` - 数学运算日志
+
 ### 日志文件
 - 位置: `api_log.txt`
 - 格式: `[时间戳] [级别] 消息内容`
+- 示例:
+  ```
+  [2024-01-25 14:30:45] [DECODE] 开始解码消息: length=256
+  [2024-01-25 14:30:45] [VARIABLE] 替换变量: [qq] -> 789012
+  [2024-01-25 14:30:45] [TIME] 时间变量: (Y) -> 2024
+  ```
 
 ## 特殊功能
 
@@ -182,10 +359,23 @@ API_PORT = 8889           # 监听端口
 - 中文括号 `（）` → 英文括号 `()`
 - 中文冒号 `：` → 英文冒号 `:`
 
-### CQ码支持
+### CQ码支持（增强）
 自动解析常见CQ码格式，如：
 - `[CQ:at,qq=123456]` → `[at.123456]`
 - `[CQ:image,url=http://...]` → `[image.http://...]`
+- `[CQ:face,id=123]` → `[face.123]`
+- `[CQ:reply,id=456]` → `[reply.456]`
+
+### 分句发送（新增）
+检测分句发送语法：
+- `(-5-)` → 分句发送标记
+- 返回特殊类型，由调用方处理
+
+### 缓存机制（新增）
+- HTTP请求结果缓存（5分钟）
+- 词库数据内存缓存
+- 配置信息缓存
+- 冷却时间缓存
 
 ## 部署说明
 
@@ -200,10 +390,12 @@ API_PORT = 8889           # 监听端口
 3. **启动服务**:
    ```bash
    python Van_keyword.py
+   # 或使用uvicorn
+   uvicorn Van_keyword_WebAPI:api_app --host 0.0.0.0 --port 8889 --reload
    ```
 
 4. **验证服务**:
-   访问 `http://localhost:8889/docs` 或 [公开文档](http://white.oneplus.xin/api/dosc.html)查看API文档
+   访问 `http://localhost:8889/docs` 或 [公开文档](http://white.oneplus.xin/api/dosc.html) 或 [位于Github的文档](https://github.com/Van-Zone/Van-Keyword-For-Web-API/blob/main/dosc.html)查看API文档
 
 ## 故障排除
 
@@ -211,6 +403,8 @@ API_PORT = 8889           # 监听端口
 1. **端口占用**: 修改`API_PORT`配置
 2. **权限不足**: 检查管理员配置
 3. **词库不生效**: 检查文件权限和路径
+4. **变量不生效**: 检查event_data参数是否完整
+5. **多媒体消息无法显示**: 确认URL格式正确，检查网络连通性
 
 ### 调试模式
 启用详细日志：
@@ -218,19 +412,59 @@ API_PORT = 8889           # 监听端口
 logger.debug("调试信息")
 ```
 
+### 新增问题排查：
+
+1. **数学运算错误**
+   - 检查表达式格式：`(+1+2)` 不是 `(1+2)`
+   - 避免除零错误
+   - 查看运算日志
+
+2. **冷却时间异常**
+   - 检查冷却文件权限
+   - 确认时间戳格式
+   - 查看冷却日志
+
+3. **内存使用过高**
+   - 词库较大时注意监控内存
+   - 调整缓存大小设置
+   - 定期清理日志文件
+
 ## 注意事项
 
 1. **数据备份**: 定期备份词库文件
 2. **权限控制**: 谨慎配置管理员权限
 3. **性能优化**: 词库过大时考虑分库管理
 4. **安全考虑**: 定期更换API Token
+5. **升级兼容性**: v2.0完全兼容v1.0，无需迁移数据
+6. **日志管理**: 建议定期清理日志文件，避免磁盘空间不足
 
 ## 版本信息
 
-- 版本: 1.0.0
-- 作者: VanBot团队
-- 更新日期: 2026年
+- **版本**: 2.0.0
+- **作者**: VanBot团队
+- **更新日期**: 2026年1月25日
+- **主要更新**:
+  1. 完整的消息解码系统
+  2. 多媒体消息支持
+  3. 时间变量系统
+  4. 数学运算功能
+  5. 冷却时间增强
+  6. 条件判断支持
+  7. API端点扩展
+  8. 性能优化改进
 
 ---
 
-**提示**: 首次启动时会显示API Token，请妥善保管。所有API调用都需要在Header或Body中提供正确的Token。
+**提示**: 
+- 首次启动时会显示API Token，请妥善保管。所有API调用都需要在Header或Body中提供正确的Token。
+- 新版本提供了更强大的消息处理能力，特别适合需要复杂交互和多媒体消息的聊天机器人场景。
+- 所有原有功能保持不变，可以无缝升级。
+
+---
+
+## 写在最后的话：
+**有些功能可能并不很适合在Web API服务器使用，但我还是硬写过来了**
+**希望各位可以及时反馈一些BUG和问题**
+**Van词库交流群：1019070322**
+
+---

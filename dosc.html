@@ -1,0 +1,2735 @@
+[file name]: dosc.html
+[file content begin]
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VanBot词库API文档 - v2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #f8f9fa;
+            --dark-color: #2c3e50;
+            --border-color: #dee2e6;
+            --code-bg: #f8f9fa;
+            --sidebar-bg: #f8f9fa;
+            --new-feature-color: #7209b7;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+        
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo h1 i {
+            color: var(--secondary-color);
+        }
+        
+        .nav-group {
+            margin-bottom: 20px;
+        }
+        
+        .nav-group-title {
+            padding: 8px 20px;
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-links {
+            list-style: none;
+        }
+        
+        .nav-links li a {
+            display: block;
+            padding: 10px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            position: relative;
+        }
+        
+        .nav-links li a:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+        }
+        
+        .nav-links li a.active {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+            border-left-color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .nav-links li a.new::after {
+            content: "NEW";
+            position: absolute;
+            right: 10px;
+            top: 8px;
+            background-color: var(--new-feature-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .nav-links li a i {
+            width: 20px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        /* 主内容区样式 */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .page-header h2 {
+            color: var(--dark-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            background-color: var(--light-color);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-header h3 {
+            color: var(--dark-color);
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .method.get { background-color: #61affe; color: white; }
+        .method.post { background-color: #49cc90; color: white; }
+        .method.put { background-color: #fca130; color: white; }
+        .method.delete { background-color: #f93e3e; color: white; }
+        
+        .endpoint {
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--dark-color);
+            background-color: rgba(0,0,0,0.02);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .description {
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        /* 表格样式 */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        table th {
+            background-color: var(--light-color);
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        table tr:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .required {
+            color: var(--danger-color);
+            font-weight: 600;
+        }
+        
+        /* 代码块样式 */
+        pre {
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid var(--border-color);
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .json-key { color: #d73a49; }
+        .json-string { color: #032f62; }
+        .json-number { color: #005cc5; }
+        .json-boolean { color: #6f42c1; }
+        .json-null { color: #6a737d; }
+        
+        /* 响应状态样式 */
+        .status-code {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .status-200 { background-color: var(--success-color); color: white; }
+        .status-400 { background-color: var(--warning-color); color: white; }
+        .status-401 { background-color: var(--danger-color); color: white; }
+        .status-404 { background-color: #6c757d; color: white; }
+        .status-500 { background-color: var(--danger-color); color: white; }
+        
+        /* 响应示例样式 */
+        .response-example {
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        /* 页脚样式 */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+            font-size: 0.9rem;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+        }
+        
+        /* 工具类 */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge.required {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .badge.optional {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .badge.new {
+            background-color: var(--new-feature-color);
+            color: white;
+        }
+        
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            color: #856404;
+        }
+        
+        .note.warning {
+            background-color: #f8d7da;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .note.info {
+            background-color: #d1ecf1;
+            border-left-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        .note.success {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+            color: #155724;
+        }
+        
+        .note.new {
+            background-color: #e6d4f7;
+            border-left-color: var(--new-feature-color);
+            color: #4a148c;
+        }
+        
+        .icon {
+            display: inline-block;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* 新特性标记 */
+        .new-feature {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: var(--new-feature-color);
+            color: white;
+            font-size: 0.7rem;
+            border-radius: 10px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 侧边栏导航 -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1><i class="fas fa-robot"></i> VanBot API <span class="new-feature">v2.0</span></h1>
+                <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">关键词管理系统 - 功能增强版</p>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">基础信息</div>
+                <ul class="nav-links">
+                    <li><a href="#overview" class="active"><i class="fas fa-home"></i> 概览</a></li>
+                    <li><a href="#new-features"><i class="fas fa-star"></i> 新特性 <span class="new-feature">NEW</span></a></li>
+                    <li><a href="#authentication"><i class="fas fa-key"></i> 认证方式</a></li>
+                    <li><a href="#data-structure"><i class="fas fa-folder"></i> 数据结构</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">基础信息接口</div>
+                <ul class="nav-links">
+                    <li><a href="#api-root"><i class="fas fa-globe"></i> 根目录</a></li>
+                    <li><a href="#api-status"><i class="fas fa-server"></i> 服务器状态</a></li>
+                    <li><a href="#api-examples"><i class="fas fa-code"></i> API示例 <span class="new-feature">NEW</span></a></li>
+                    <li><a href="#api-test"><i class="fas fa-vial"></i> 测试接口</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">关键词查询接口</div>
+                <ul class="nav-links">
+                    <li><a href="#api-query"><i class="fas fa-search"></i> 查询关键词回复</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">高级消息处理 <span class="new-feature">NEW</span></div>
+                <ul class="nav-links">
+                    <li><a href="#api-decode" class="new"><i class="fas fa-code-branch"></i> 消息解码</a></li>
+                    <li><a href="#api-transcode" class="new"><i class="fas fa-exchange-alt"></i> 消息转码</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">词条管理接口</div>
+                <ul class="nav-links">
+                    <li><a href="#api-add"><i class="fas fa-plus-circle"></i> 添加词条</a></li>
+                    <li><a href="#api-remove"><i class="fas fa-minus-circle"></i> 删除词条</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">回复管理接口</div>
+                <ul class="nav-links">
+                    <li><a href="#api-add-reply"><i class="fas fa-comment-medical"></i> 添加回复选项</a></li>
+                    <li><a href="#api-remove-reply"><i class="fas fa-comment-slash"></i> 删除回复选项</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">查询与统计接口</div>
+                <ul class="nav-links">
+                    <li><a href="#api-search"><i class="fas fa-binoculars"></i> 搜索关键词</a></li>
+                    <li><a href="#api-list"><i class="fas fa-list"></i> 列出所有词条</a></li>
+                    <li><a href="#api-count"><i class="fas fa-calculator"></i> 统计词条数量</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">配置接口</div>
+                <ul class="nav-links">
+                    <li><a href="#api-config"><i class="fas fa-cog"></i> 获取配置</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">变量系统 <span class="new-feature">NEW</span></div>
+                <ul class="nav-links">
+                    <li><a href="#variables"><i class="fas fa-code"></i> 变量说明</a></li>
+                    <li><a href="#multimedia"><i class="fas fa-photo-video"></i> 多媒体消息</a></li>
+                </ul>
+            </div>
+            
+            <div class="nav-group">
+                <div class="nav-group-title">错误码</div>
+                <ul class="nav-links">
+                    <li><a href="#error-codes"><i class="fas fa-exclamation-triangle"></i> 错误码说明</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 概览 -->
+            <div class="page-header" id="overview">
+                <h2><i class="fas fa-book"></i> VanBot词库API文档 <span class="new-feature">v2.0</span></h2>
+                <p>功能增强版 - 支持高级消息处理和变量系统</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="description">
+                        <p>VanBot词库API v2.0是一个基于HTTP的RESTful接口，在原有词库管理功能基础上新增了强大的消息处理能力，支持复杂变量替换、多媒体消息、时间变量、数学运算等高级特性。</p>
+                        
+                        <div class="note new">
+                            <i class="fas fa-star"></i> <strong>新版本特性:</strong> 完全兼容v1.0 API，新增高级消息处理功能，适合复杂交互场景。
+                        </div>
+                        
+                        <div class="note">
+                            <i class="fas fa-info-circle"></i> <strong>基础URL:</strong> http://0.0.0.0:8889
+                        </div>
+                        
+                        <div class="note info">
+                            <i class="fas fa-shield-alt"></i> <strong>认证方式:</strong> 所有API接口都需要Token认证，Token在服务器启动时随机生成并显示在控制台。
+                        </div>
+                        
+                        <div class="note success">
+                            <i class="fas fa-check-circle"></i> <strong>Swagger文档:</strong> 访问 <a href="http://0.0.0.0:8889/docs" target="_blank">http://0.0.0.0:8889/docs</a> 获取交互式API文档
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 新特性 -->
+            <div class="page-header" id="new-features">
+                <h2><i class="fas fa-star"></i> 新特性说明 <span class="new-feature">v2.0</span></h2>
+                <p>功能增强版新增功能概览</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-bolt"></i> 新增核心功能</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="150">功能</th>
+                                    <th>说明</th>
+                                    <th width="200">示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>消息解码</strong></td>
+                                    <td>完整的变量替换系统，支持复杂消息处理</td>
+                                    <td><code>你好[qq]！现在是(Y)年(M)月(D)日</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>时间变量</strong></td>
+                                    <td>实时时间变量替换</td>
+                                    <td><code>(Y) (M) (D) (h) (m) (s)</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>数学运算</strong></td>
+                                    <td>支持加减乘除运算</td>
+                                    <td><code>(+5*3/2) → 7.5</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>随机数</strong></td>
+                                    <td>生成指定范围随机数</td>
+                                    <td><code>(1-100) → 随机1-100</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>条件判断</strong></td>
+                                    <td>支持数值和字符串比较</td>
+                                    <td><code>{10>5} {a=b}</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>冷却时间</strong></td>
+                                    <td>基于用户的指令冷却</td>
+                                    <td><code>(60~) 设置60秒冷却</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>多媒体消息</strong></td>
+                                    <td>支持图片、表情、@等</td>
+                                    <td><code>[image.url] [face.id]</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-exchange-alt"></i> 兼容性说明</div>
+                        <div class="note success">
+                            <i class="fas fa-check-circle"></i> <strong>完全向后兼容:</strong> 所有v1.0 API接口保持不变，新增参数均为可选参数，不影响原有调用。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 认证方式 -->
+            <div class="page-header" id="authentication">
+                <h2><i class="fas fa-key"></i> 认证方式</h2>
+                <p>所有接口都需要双重Token认证</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-lock"></i> 认证要求</div>
+                        <p>所有 <code>POST /api/v1/keyword</code> 接口都需要双重认证：</p>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>认证方式</th>
+                                    <th>位置</th>
+                                    <th>示例</th>
+                                    <th>说明</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>HTTP Header认证</td>
+                                    <td>请求头</td>
+                                    <td><code>Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d</code></td>
+                                    <td>必须在HTTP Header中提供</td>
+                                </tr>
+                                <tr>
+                                    <td>请求体认证</td>
+                                    <td>JSON请求体</td>
+                                    <td><code>"token": "ff24ee688d4d99b016d5ab0e3b78570d"</code></td>
+                                    <td>必须在JSON请求体中包含</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-exclamation-triangle"></i> 注意事项</div>
+                        <ul style="padding-left: 20px; margin: 15px 0;">
+                            <li>Token在服务器启动时随机生成，每次启动都会不同</li>
+                            <li>Token显示在服务器控制台输出中</li>
+                            <li>双重认证确保API调用安全性</li>
+                            <li>缺少任一认证都会返回401错误</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据结构 -->
+            <div class="page-header" id="data-structure">
+                <h2><i class="fas fa-folder"></i> 数据结构</h2>
+                <p>系统文件与目录结构说明</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="description">
+                        <p>所有数据文件都保存在 <code>Van_keyword_data</code> 目录中，该目录位于脚本文件同目录下。</p>
+                    </div>
+                    
+                    <pre><code>Van_keyword_data/
+├── 123456/                      # 机器人ID
+│   ├── lexicon/                 # 词库目录
+│   │   ├── M_789012.json       # 用户词库
+│   │   ├── official_group.json # 官方群词库
+│   │   └── common.json         # 公共词库
+│   ├── config/                  # 配置目录
+│   │   └── M_789012.txt        # 用户配置
+│   ├── expand/                  # 扩展词库
+│   ├── cooling/                 # 冷却文件
+│   ├── select.txt              # 词库选择配置
+│   └── switch.txt              # 群开关配置
+├── qq.txt                       # 管理员列表
+└── 其他机器人ID/                 # 其他机器人</code></pre>
+                    
+                    <div class="note">
+                        <i class="fas fa-lightbulb"></i> <strong>提示:</strong> 数据目录会在首次运行时自动创建，无需手动创建。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 基础信息接口 -->
+            <div class="page-header" id="api-root">
+                <h2><i class="fas fa-globe"></i> 基础信息接口</h2>
+                <p>服务器基本信息查询接口</p>
+            </div>
+            
+            <!-- 根目录 -->
+            <div class="card" id="api-root">
+                <div class="card-header">
+                    <h3><span class="method get">GET</span> <span class="endpoint">/</span></h3>
+                    <span>根目录</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>获取API服务器基本信息和状态。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X GET http://0.0.0.0:8889/</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"status"</span>: <span class="json-string">"online"</span>,
+  <span class="json-key">"service"</span>: <span class="json-string">"VanBot Keyword API v2.0"</span>,
+  <span class="json-key">"docs"</span>: <span class="json-string">"http://0.0.0.0:8889/docs"</span>,
+  <span class="json-key">"time"</span>: <span class="json-string">"2024-01-15 14:30:25"</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 服务器状态 -->
+            <div class="card" id="api-status">
+                <div class="card-header">
+                    <h3><span class="method get">GET</span> <span class="endpoint">/status</span></h3>
+                    <span>服务器状态</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>获取API服务器详细状态信息，包括监听地址、端口和数据目录。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X GET http://0.0.0.0:8889/status</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"host"</span>: <span class="json-string">"0.0.0.0"</span>,
+  <span class="json-key">"port"</span>: <span class="json-number">8889</span>,
+  <span class="json-key">"token"</span>: <span class="json-string">"ff24ee68..."</span>,
+  <span class="json-key">"running"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"data_dir"</span>: <span class="json-string">"C:\\...\\Van_keyword_data"</span>,
+  <span class="json-key">"features"</span>: [
+    <span class="json-string">"关键词查询"</span>,
+    <span class="json-string">"词条管理"</span>,
+    <span class="json-string">"变量替换系统"</span>,
+    <span class="json-string">"多媒体消息处理"</span>,
+    <span class="json-string">"冷却时间系统"</span>,
+    <span class="json-string">"时间变量"</span>,
+    <span class="json-string">"数学运算"</span>,
+    <span class="json-string">"随机数生成"</span>
+  ]
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- API示例 -->
+            <div class="card" id="api-examples">
+                <div class="card-header">
+                    <h3><span class="method get">GET</span> <span class="endpoint">/api/v1/examples</span> <span class="new-feature">NEW</span></h3>
+                    <span>API使用示例</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>获取各种API调用的完整示例，方便快速上手。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X GET http://0.0.0.0:8889/api/v1/examples</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"examples"</span>: {
+    <span class="json-key">"query_example"</span>: {
+      <span class="json-key">"method"</span>: <span class="json-string">"POST"</span>,
+      <span class="json-key">"url"</span>: <span class="json-string">"http://0.0.0.0:8889/api/v1/keyword"</span>,
+      <span class="json-key">"headers"</span>: {
+        <span class="json-key">"Authorization"</span>: <span class="json-string">"Bearer ff24ee688d4d99b016d5ab0e3b78570d"</span>,
+        <span class="json-key">"Content-Type"</span>: <span class="json-string">"application/json"</span>
+      },
+      <span class="json-key">"body"</span>: {
+        <span class="json-key">"action"</span>: <span class="json-string">"query"</span>,
+        <span class="json-key">"botid"</span>: <span class="json-number">123456</span>,
+        <span class="json-key">"userid"</span>: <span class="json-number">789012</span>,
+        <span class="json-key">"msg"</span>: <span class="json-string">"你好"</span>,
+        <span class="json-key">"token"</span>: <span class="json-string">"ff24ee688d4d99b016d5ab0e3b78570d"</span>
+      }
+    },
+    <span class="json-key">"decode_example"</span>: {
+      <span class="json-key">"method"</span>: <span class="json-string">"POST"</span>,
+      <span class="json-key">"url"</span>: <span class="json-string">"http://0.0.0.0:8889/api/v1/keyword"</span>,
+      <span class="json-key">"headers"</span>: {
+        <span class="json-key">"Authorization"</span>: <span class="json-string">"Bearer ff24ee688d4d99b016d5ab0e3b78570d"</span>,
+        <span class="json-key">"Content-Type"</span>: <span class="json-string">"application/json"</span>
+      },
+      <span class="json-key">"body"</span>: {
+        <span class="json-key">"action"</span>: <span class="json-string">"decode"</span>,
+        <span class="json-key">"botid"</span>: <span class="json-number">123456</span>,
+        <span class="json-key">"userid"</span>: <span class="json-number">789012</span>,
+        <span class="json-key">"text"</span>: <span class="json-string">"现在是(Y)年(M)月(D)日 [image.http://example.com/test.jpg]"</span>,
+        <span class="json-key">"event_data"</span>: {
+          <span class="json-key">"user_id"</span>: <span class="json-number">789012</span>,
+          <span class="json-key">"group_id"</span>: <span class="json-number">987654</span>,
+          <span class="json-key">"self_id"</span>: <span class="json-number">123456</span>
+        },
+        <span class="json-key">"token"</span>: <span class="json-string">"ff24ee688d4d99b016d5ab0e3b78570d"</span>
+      }
+    }
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 测试接口 -->
+            <div class="card" id="api-test">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>测试接口</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>测试API服务器是否正常运行，验证Token有效性。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "test"</td>
+                                    <td>"test"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "test",
+    "botid": 123456,
+    "userid": 789012,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"test"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"API服务器运行正常"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>,
+  <span class="json-key">"data_dir"</span>: <span class="json-string">"C:\\...\\Van_keyword_data"</span>,
+  <span class="json-key">"features"</span>: [
+    <span class="json-string">"基础查询功能"</span>,
+    <span class="json-string">"变量替换系统 [qq], [name], [群号]"</span>,
+    <span class="json-string">"时间变量 (Y), (M), (D), (h), (m), (s)"</span>,
+    <span class="json-string">"数学运算 (+1+2)"</span>,
+    <span class="json-string">"随机数生成 (1-100)"</span>,
+    <span class="json-string">"冷却时间系统 (60~)"</span>,
+    <span class="json-string">"多媒体消息处理 [image], [face], [at]"</span>,
+    <span class="json-string">"条件判断 {a>b}"</span>
+  ]
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 关键词查询接口 -->
+            <div class="page-header" id="api-query">
+                <h2><i class="fas fa-search"></i> 关键词查询接口</h2>
+                <p>查询关键词回复相关接口</p>
+            </div>
+            
+            <!-- 查询关键词回复 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>查询关键词回复</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>根据用户输入的消息查询匹配的关键词并返回回复。支持模糊匹配和精确匹配两种模式。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "query"</td>
+                                    <td>"query"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>msg</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>要查询的消息内容</td>
+                                    <td>"你好"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>mode</code></td>
+                                    <td>integer</td>
+                                    <td>否</td>
+                                    <td>匹配模式：0-模糊匹配(默认) 1-精确匹配</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td><code>groupid</code></td>
+                                    <td>integer</td>
+                                    <td>否</td>
+                                    <td>群号，用于群聊场景</td>
+                                    <td>654321</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "query",
+    "botid": 123456,
+    "userid": 789012,
+    "msg": "你好",
+    "mode": 1,
+    "groupid": 654321,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"query"</span>,
+  <span class="json-key">"found"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"reply"</span>: <span class="json-string">"你好啊！"</span>,
+  <span class="json-key">"mode"</span>: <span class="json-string">"exact"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 未找到匹配
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"query"</span>,
+  <span class="json-key">"found"</span>: <span class="json-boolean">false</span>,
+  <span class="json-key">"reply"</span>: <span class="json-string">""</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <i class="fas fa-lightbulb"></i> <strong>提示:</strong> 当有多个回复选项时，系统会随机选择一个返回，增加回复的多样性。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高级消息处理 -->
+            <div class="page-header">
+                <h2><i class="fas fa-code-branch"></i> 高级消息处理接口 <span class="new-feature">NEW</span></h2>
+                <p>消息解码、转码等高级功能</p>
+            </div>
+            
+            <!-- 消息解码 -->
+            <div class="card" id="api-decode">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span> <span class="new-feature">NEW</span></h3>
+                    <span>消息解码</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>对包含变量、多媒体消息、时间变量等的复杂消息进行解码处理，返回处理后的消息内容。支持完整的变量替换系统和多媒体消息处理。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "decode"</td>
+                                    <td>"decode"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>text</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>要解码的文本内容</td>
+                                    <td>"你好[qq]！现在是(Y)年(M)月(D)日"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>event_data</code></td>
+                                    <td>object</td>
+                                    <td>否</td>
+                                    <td>事件数据，用于变量替换</td>
+                                    <td>{"user_id": 789012, "group_id": 987654}</td>
+                                </tr>
+                                <tr>
+                                    <td><code>lexicon_id</code></td>
+                                    <td>integer</td>
+                                    <td>否</td>
+                                    <td>词条ID，用于冷却系统</td>
+                                    <td>1001</td>
+                                </tr>
+                                <tr>
+                                    <td><code>lexicon_n</code></td>
+                                    <td>integer</td>
+                                    <td>否</td>
+                                    <td>词库词条数</td>
+                                    <td>50</td>
+                                </tr>
+                                <tr>
+                                    <td><code>cool_config</code></td>
+                                    <td>boolean</td>
+                                    <td>否</td>
+                                    <td>是否启用冷却检查，默认true</td>
+                                    <td>true</td>
+                                </tr>
+                                <tr>
+                                    <td><code>groupid</code></td>
+                                    <td>integer</td>
+                                    <td>否</td>
+                                    <td>群组ID</td>
+                                    <td>987654</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "decode",
+    "botid": 123456,
+    "userid": 789012,
+    "text": "欢迎[qq]！\\n今日日期：(Y)/(M)/(D)\\n随机数：(1-100)\\n数学运算：(+5*3/2)\\n[image.http://example.com/avatar.jpg]",
+    "event_data": {
+      "user_id": 789012,
+      "group_id": 987654,
+      "self_id": 123456,
+      "sender": {
+        "nickname": "小明",
+        "card": "技术宅"
+      }
+    },
+    "cool_config": true,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功 - 文本消息
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"decode"</span>,
+  <span class="json-key">"result"</span>: {
+    <span class="json-key">"type"</span>: <span class="json-string">"text"</span>,
+    <span class="json-key">"content"</span>: <span class="json-string">"欢迎789012！\\n今日日期：2024/1/15\\n随机数：42\\n数学运算：7.5\\n"</span>
+  },
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功 - 混合消息
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"decode"</span>,
+  <span class="json-key">"result"</span>: {
+    <span class="json-key">"type"</span>: <span class="json-string">"mixed"</span>,
+    <span class="json-key">"messages"</span>: [
+      {
+        <span class="json-key">"type"</span>: <span class="json-string">"text"</span>,
+        <span class="json-key">"content"</span>: <span class="json-string">"欢迎789012！现在是2024年1月15日 "</span>
+      },
+      {
+        <span class="json-key">"type"</span>: <span class="json-string">"image"</span>,
+        <span class="json-key">"url"</span>: <span class="json-string">"http://example.com/test.jpg"</span>
+      }
+    ]
+  },
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 冷却中
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"decode"</span>,
+  <span class="json-key">"result"</span>: {
+    <span class="json-key">"type"</span>: <span class="json-string">"text"</span>,
+    <span class="json-key">"content"</span>: <span class="json-string">"指令冷却中，剩余45秒"</span>
+  },
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="note new">
+                        <i class="fas fa-lightbulb"></i> <strong>新功能:</strong> 支持复杂变量替换、多媒体消息、时间变量、数学运算、随机数生成、冷却时间、条件判断等高级功能。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 消息转码 -->
+            <div class="card" id="api-transcode">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span> <span class="new-feature">NEW</span></h3>
+                    <span>消息转码</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>将CQ码格式的消息转换为内部格式，方便后续处理。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "transcode"</td>
+                                    <td>"transcode"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>text</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>要转码的文本内容</td>
+                                    <td>"[CQ:image,url=http://example.com/img.jpg]"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "transcode",
+    "text": "[CQ:image,url=http://example.com/img.jpg][CQ:at,qq=123456]",
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"transcode"</span>,
+  <span class="json-key">"original"</span>: <span class="json-string">"[CQ:image,url=http://example.com/img.jpg][CQ:at,qq=123456]"</span>,
+  <span class="json-key">"transcoded"</span>: <span class="json-string">"[image.http://example.com/img.jpg][at.123456]"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <i class="fas fa-lightbulb"></i> <strong>提示:</strong> 转码功能主要用于将CQ码格式转换为内部格式，便于后续的解码处理。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 变量系统 -->
+            <div class="page-header" id="variables">
+                <h2><i class="fas fa-code"></i> 变量系统 <span class="new-feature">NEW</span></h2>
+                <p>支持的变量和函数说明</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-tag"></i> 基础变量</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="120">变量</th>
+                                    <th>说明</th>
+                                    <th width="200">示例</th>
+                                    <th width="150">输出</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>[qq]</code></td>
+                                    <td>用户QQ号</td>
+                                    <td><code>你好[qq]！</code></td>
+                                    <td><code>你好789012！</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>[name]</code></td>
+                                    <td>用户昵称</td>
+                                    <td><code>欢迎[name]</code></td>
+                                    <td><code>欢迎小明</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>[群号]</code></td>
+                                    <td>群组ID</td>
+                                    <td><code>群号：[群号]</code></td>
+                                    <td><code>群号：987654</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>[词条id]</code></td>
+                                    <td>词条ID</td>
+                                    <td><code>词条ID：[词条id]</code></td>
+                                    <td><code>词条ID：1001</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>[词汇量]</code></td>
+                                    <td>词库词条数</td>
+                                    <td><code>词库大小：[词汇量]</code></td>
+                                    <td><code>词库大小：50</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>[当前词库]</code></td>
+                                    <td>当前词库名称</td>
+                                    <td><code>当前词库：[当前词库]</code></td>
+                                    <td><code>当前词库：M_789012</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-clock"></i> 时间变量</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="80">变量</th>
+                                    <th>说明</th>
+                                    <th width="200">示例</th>
+                                    <th width="150">输出</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>(Y)</code></td>
+                                    <td>年份（4位）</td>
+                                    <td><code>今年是(Y)年</code></td>
+                                    <td><code>今年是2024年</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(M)</code></td>
+                                    <td>月份（1-12）</td>
+                                    <td><code>当前月份：(M)</code></td>
+                                    <td><code>当前月份：1</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(D)</code></td>
+                                    <td>日期（1-31）</td>
+                                    <td><code>今天是(D)号</code></td>
+                                    <td><code>今天是15号</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(h)</code></td>
+                                    <td>小时（0-23）</td>
+                                    <td><code>当前时间：(h)点</code></td>
+                                    <td><code>当前时间：14点</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(m)</code></td>
+                                    <td>分钟（0-59）</td>
+                                    <td><code>现在是(h):(m)</code></td>
+                                    <td><code>现在是14:30</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(s)</code></td>
+                                    <td>秒数（0-59）</td>
+                                    <td><code>当前秒数：(s)</code></td>
+                                    <td><code>当前秒数：45</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-calculator"></i> 数学运算</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="120">表达式</th>
+                                    <th>说明</th>
+                                    <th width="150">示例</th>
+                                    <th width="100">输出</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>(+1+2)</code></td>
+                                    <td>加法运算</td>
+                                    <td><code>1+2=(+1+2)</code></td>
+                                    <td><code>1+2=3</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(+5-3)</code></td>
+                                    <td>减法运算</td>
+                                    <td><code>5-3=(+5-3)</code></td>
+                                    <td><code>5-3=2</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(+2*3)</code></td>
+                                    <td>乘法运算</td>
+                                    <td><code>2×3=(+2*3)</code></td>
+                                    <td><code>2×3=6</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(+6/2)</code></td>
+                                    <td>除法运算</td>
+                                    <td><code>6÷2=(+6/2)</code></td>
+                                    <td><code>6÷2=3</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(+1+2*3)</code></td>
+                                    <td>混合运算</td>
+                                    <td><code>1+2×3=(+1+2*3)</code></td>
+                                    <td><code>1+2×3=7</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-dice"></i> 随机数生成</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="120">表达式</th>
+                                    <th>说明</th>
+                                    <th width="150">示例</th>
+                                    <th>输出</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>(1-100)</code></td>
+                                    <td>生成1-100随机整数</td>
+                                    <td><code>随机数：(1-100)</code></td>
+                                    <td><code>随机数：42</code></td>
+                                </tr>
+                                <tr>
+                                    <td><code>(10-50)</code></td>
+                                    <td>生成10-50随机整数</td>
+                                    <td><code>温度：(10-50)℃</code></td>
+                                    <td><code>温度：25℃</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-hourglass-half"></i> 冷却时间</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="120">表达式</th>
+                                    <th>说明</th>
+                                    <th width="150">示例</th>
+                                    <th>效果</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>(60~)</code></td>
+                                    <td>设置60秒冷却</td>
+                                    <td><code>签到成功(60~)</code></td>
+                                    <td>60秒内不能再次签到</td>
+                                </tr>
+                                <tr>
+                                    <td><code>(0~)</code></td>
+                                    <td>冷却到当天午夜</td>
+                                    <td><code>每日奖励(0~)</code></td>
+                                    <td>当天不能再次领取</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-balance-scale"></i> 条件判断</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="120">表达式</th>
+                                    <th>说明</th>
+                                    <th width="150">示例</th>
+                                    <th>效果</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>{a>b}</code></td>
+                                    <td>a大于b</td>
+                                    <td><code>{10>5}通过</code></td>
+                                    <td>显示"通过"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>{a<b}</code></td>
+                                    <td>a小于b</td>
+                                    <td><code>{5<10}正确</code></td>
+                                    <td>显示"正确"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>{a=b}</code></td>
+                                    <td>a等于b</td>
+                                    <td><code>{5=5}相等</code></td>
+                                    <td>显示"相等"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 多媒体消息 -->
+            <div class="page-header" id="multimedia">
+                <h2><i class="fas fa-photo-video"></i> 多媒体消息 <span class="new-feature">NEW</span></h2>
+                <p>支持的多媒体消息类型</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 消息类型对照表</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>类型</th>
+                                    <th>内部格式</th>
+                                    <th>CQ码格式</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>图片</strong></td>
+                                    <td><code>[image.URL]</code></td>
+                                    <td><code>[CQ:image,url=URL]</code></td>
+                                    <td>图片消息</td>
+                                    <td><code>[image.http://example.com/img.jpg]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>表情</strong></td>
+                                    <td><code>[face.ID]</code></td>
+                                    <td><code>[CQ:face,id=ID]</code></td>
+                                    <td>表情消息</td>
+                                    <td><code>[face.123]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>@某人</strong></td>
+                                    <td><code>[at.QQ号]</code></td>
+                                    <td><code>[CQ:at,qq=QQ号]</code></td>
+                                    <td>@特定用户</td>
+                                    <td><code>[at.123456]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>回复</strong></td>
+                                    <td><code>[reply.消息ID]</code></td>
+                                    <td><code>[CQ:reply,id=消息ID]</code></td>
+                                    <td>回复消息</td>
+                                    <td><code>[reply.456789]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>视频</strong></td>
+                                    <td><code>[video.URL]</code></td>
+                                    <td><code>[CQ:video,url=URL]</code></td>
+                                    <td>视频消息</td>
+                                    <td><code>[video.http://example.com/video.mp4]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>语音</strong></td>
+                                    <td><code>[record.URL]</code></td>
+                                    <td><code>[CQ:record,url=URL]</code></td>
+                                    <td>语音消息</td>
+                                    <td><code>[record.http://example.com/voice.amr]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>音乐</strong></td>
+                                    <td><code>[music.标题.URL]</code></td>
+                                    <td><code>[CQ:music,title=标题,url=URL]</code></td>
+                                    <td>音乐分享</td>
+                                    <td><code>[music.歌曲名.http://example.com/music.mp3]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>分享</strong></td>
+                                    <td><code>[share.URL]</code></td>
+                                    <td><code>[CQ:share,url=URL]</code></td>
+                                    <td>链接分享</td>
+                                    <td><code>[share.http://example.com]</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>JSON</strong></td>
+                                    <td><code>[json.JSON数据]</code></td>
+                                    <td><code>[CQ:json,data=JSON数据]</code></td>
+                                    <td>JSON消息</td>
+                                    <td><code>[json.{"app":"com.tencent.structmsg"}]</code></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 综合示例</div>
+                        <pre><code>// 包含多种消息类型的示例
+欢迎[qq]！
+今天是(Y)年(M)月(D)日
+随机天气：(1-5)级风
+数学测试：(+2*3/4)=?
+[face.123] [image.http://example.com/weather.jpg]
+@一下管理员：[at.123456]</code></pre>
+                        
+                        <div class="note new">
+                            <i class="fas fa-lightbulb"></i> <strong>解码结果:</strong> 上述消息会被解码为混合消息类型，包含文本、表情、图片、@等多种消息元素。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 词条管理接口 -->
+            <div class="page-header">
+                <h2><i class="fas fa-edit"></i> 词条管理接口</h2>
+                <p>关键词条的增加、删除等管理功能</p>
+            </div>
+            
+            <!-- 添加词条 -->
+            <div class="card" id="api-add">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>添加词条</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>向词库中添加新的关键词条，支持设置模糊匹配或精确匹配模式。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "add"</td>
+                                    <td>"add"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>keyword</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>关键词内容</td>
+                                    <td>"早上好"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reply</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>回复内容</td>
+                                    <td>"早上好呀！今天天气不错呢~"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>mode</code></td>
+                                    <td>integer</td>
+                                    <td>否</td>
+                                    <td>匹配模式：0-模糊匹配 1-精确匹配(默认)</td>
+                                    <td>1</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "add",
+    "botid": 123456,
+    "userid": 789012,
+    "keyword": "早上好",
+    "reply": "早上好呀！今天天气不错呢~",
+    "mode": 1,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 添加成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"add"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"添加成功"</span>,
+  <span class="json-key">"keyword"</span>: <span class="json-string">"早上好"</span>,
+  <span class="json-key">"mode"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-400">400</span> 词条已存在
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">false</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"add"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"词条已存在"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 删除词条 -->
+            <div class="card" id="api-remove">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>删除词条</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>从词库中删除指定的关键词条。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "remove"</td>
+                                    <td>"remove"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>keyword</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>要删除的关键词</td>
+                                    <td>"早上好"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "remove",
+    "botid": 123456,
+    "userid": 789012,
+    "keyword": "早上好",
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 删除成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"remove"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"删除成功"</span>,
+  <span class="json-key">"keyword"</span>: <span class="json-string">"早上好"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-404">404</span> 词条不存在
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">false</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"remove"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"词条不存在"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 回复管理接口 -->
+            <div class="page-header">
+                <h2><i class="fas fa-comments"></i> 回复管理接口</h2>
+                <p>关键词回复选项的管理功能</p>
+            </div>
+            
+            <!-- 添加回复选项 -->
+            <div class="card" id="api-add-reply">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>添加回复选项</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>为已有的关键词添加新的回复选项，使关键词可以有多个随机回复。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "add_r"</td>
+                                    <td>"add_r"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>keyword</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>关键词内容</td>
+                                    <td>"你好"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reply</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>要添加的回复内容</td>
+                                    <td>"你好呀！有什么需要帮助的吗？"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "add_r",
+    "botid": 123456,
+    "userid": 789012,
+    "keyword": "你好",
+    "reply": "你好呀！有什么需要帮助的吗？",
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 添加成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"add_r"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"添加回复成功"</span>,
+  <span class="json-key">"keyword"</span>: <span class="json-string">"你好"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-404">404</span> 词条不存在
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">false</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"add_r"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"词条不存在"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 删除回复选项 -->
+            <div class="card" id="api-remove-reply">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>删除回复选项</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>删除关键词的指定回复选项。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "remove_r"</td>
+                                    <td>"remove_r"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>keyword</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>关键词内容</td>
+                                    <td>"你好"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>reply</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>要删除的回复内容</td>
+                                    <td>"你好呀！有什么需要帮助的吗？"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "remove_r",
+    "botid": 123456,
+    "userid": 789012,
+    "keyword": "你好",
+    "reply": "你好呀！有什么需要帮助的吗？",
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 删除成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"remove_r"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"删除回复成功"</span>,
+  <span class="json-key">"keyword"</span>: <span class="json-string">"你好"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                        
+                        <div class="response-example">
+                            <span class="status-code status-404">404</span> 词条或回复不存在
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">false</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"remove_r"</span>,
+  <span class="json-key">"message"</span>: <span class="json-string">"词条或回复不存在"</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 查询与统计接口 -->
+            <div class="page-header">
+                <h2><i class="fas fa-chart-bar"></i> 查询与统计接口</h2>
+                <p>词库查询、列表和统计功能</p>
+            </div>
+            
+            <!-- 搜索关键词 -->
+            <div class="card" id="api-search">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>搜索关键词</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>在词库中搜索包含指定关键词的词条，返回匹配结果列表。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "search"</td>
+                                    <td>"search"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>keyword</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>搜索关键词</td>
+                                    <td>"你好"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "search",
+    "botid": 123456,
+    "userid": 789012,
+    "keyword": "你好",
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"search"</span>,
+  <span class="json-key">"keyword"</span>: <span class="json-string">"你好"</span>,
+  <span class="json-key">"results"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"keyword"</span>: <span class="json-string">"你好"</span>,
+      <span class="json-key">"reply_count"</span>: <span class="json-number">3</span>,
+      <span class="json-key">"mode"</span>: <span class="json-number">0</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">5</span>,
+      <span class="json-key">"keyword"</span>: <span class="json-string">"你好呀"</span>,
+      <span class="json-key">"reply_count"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"mode"</span>: <span class="json-number">1</span>
+    }
+  ],
+  <span class="json-key">"count"</span>: <span class="json-number">2</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 列出所有词条 -->
+            <div class="card" id="api-list">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>列出所有词条</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>获取词库中的所有关键词条列表，包含详细信息。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "list"</td>
+                                    <td>"list"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "list",
+    "botid": 123456,
+    "userid": 789012,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"list"</span>,
+  <span class="json-key">"count"</span>: <span class="json-number">5</span>,
+  <span class="json-key">"items"</span>: [
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"keyword"</span>: <span class="json-string">"你好"</span>,
+      <span class="json-key">"mode"</span>: <span class="json-number">0</span>,
+      <span class="json-key">"replies"</span>: [<span class="json-string">"你好啊！"</span>, <span class="json-string">"你好呀！"</span>],
+      <span class="json-key">"reply_count"</span>: <span class="json-number">2</span>
+    },
+    {
+      <span class="json-key">"id"</span>: <span class="json-number">2</span>,
+      <span class="json-key">"keyword"</span>: <span class="json-string">"早上好"</span>,
+      <span class="json-key">"mode"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"replies"</span>: [<span class="json-string">"早上好！新的一天开始了"</span>],
+      <span class="json-key">"reply_count"</span>: <span class="json-number">1</span>
+    }
+  ],
+  <span class="json-key">"total"</span>: <span class="json-number">5</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="note">
+                        <i class="fas fa-lightbulb"></i> <strong>提示:</strong> 返回结果最多包含100个词条，如需获取全部数据，请多次调用或使用搜索功能。
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 统计词条数量 -->
+            <div class="card" id="api-count">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>统计词条数量</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>统计词库中的关键词数量和回复总数。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "count"</td>
+                                    <td>"count"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "count",
+    "botid": 123456,
+    "userid": 789012,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"count"</span>,
+  <span class="json-key">"keyword_count"</span>: <span class="json-number">15</span>,
+  <span class="json-key">"reply_count"</span>: <span class="json-number">42</span>,
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 配置接口 -->
+            <div class="page-header" id="api-config">
+                <h2><i class="fas fa-cog"></i> 配置接口</h2>
+                <p>系统配置获取接口</p>
+            </div>
+            
+            <!-- 获取配置 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3><span class="method post">POST</span> <span class="endpoint">/api/v1/keyword</span></h3>
+                    <span>获取配置</span>
+                </div>
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-info-circle"></i> 描述</div>
+                        <p>获取系统的配置信息，包括各种命令的触发词。</p>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 请求参数</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>参数名</th>
+                                    <th>类型</th>
+                                    <th>必填</th>
+                                    <th>说明</th>
+                                    <th>示例</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>action</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>操作类型，固定为 "get_config"</td>
+                                    <td>"get_config"</td>
+                                </tr>
+                                <tr>
+                                    <td><code>botid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>机器人ID</td>
+                                    <td>123456</td>
+                                </tr>
+                                <tr>
+                                    <td><code>userid</code></td>
+                                    <td>integer</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>用户ID</td>
+                                    <td>789012</td>
+                                </tr>
+                                <tr>
+                                    <td><code>token</code></td>
+                                    <td>string</td>
+                                    <td><span class="required">是</span></td>
+                                    <td>认证Token</td>
+                                    <td>"ff24ee688d4d99b016d5ab0e3b78570d"</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-code"></i> 请求示例</div>
+                        <pre><code>curl -X POST http://0.0.0.0:8889/api/v1/keyword \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer ff24ee688d4d99b016d5ab0e3b78570d" \
+  -d '{
+    "action": "get_config",
+    "botid": 123456,
+    "userid": 789012,
+    "token": "ff24ee688d4d99b016d5ab0e3b78570d"
+  }'</code></pre>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-reply"></i> 响应示例</div>
+                        <div class="response-example">
+                            <span class="status-code status-200">200</span> 成功
+                            <pre><code>{
+  <span class="json-key">"success"</span>: <span class="json-boolean">true</span>,
+  <span class="json-key">"action"</span>: <span class="json-string">"get_config"</span>,
+  <span class="json-key">"config"</span>: {
+    <span class="json-key">"添加主人"</span>: <span class="json-string">"添加主人"</span>,
+    <span class="json-key">"删除主人"</span>: <span class="json-string">"删除主人"</span>,
+    <span class="json-key">"词库备份"</span>: <span class="json-string">"词库备份"</span>,
+    <span class="json-key">"词库清空"</span>: <span class="json-string">"词库清空"</span>,
+    <span class="json-key">"开启本群"</span>: <span class="json-string">"开启本群"</span>,
+    <span class="json-key">"关闭本群"</span>: <span class="json-string">"关闭本群"</span>,
+    <span class="json-key">"切换词库"</span>: <span class="json-string">"切换词库"</span>,
+    <span class="json-key">"精准问答"</span>: <span class="json-string">"精准问答"</span>,
+    <span class="json-key">"模糊问答"</span>: <span class="json-string">"模糊问答"</span>,
+    <span class="json-key">"加选项"</span>: <span class="json-string">"加选项"</span>,
+    <span class="json-key">"删选项"</span>: <span class="json-string">"删选项"</span>,
+    <span class="json-key">"删词"</span>: <span class="json-string">"删词"</span>,
+    <span class="json-key">"查词"</span>: <span class="json-string">"查词"</span>,
+    <span class="json-key">"查id"</span>: <span class="json-string">"查id"</span>
+  },
+  <span class="json-key">"timestamp"</span>: <span class="json-number">1705313425</span>
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 错误码说明 -->
+            <div class="page-header" id="error-codes">
+                <h2><i class="fas fa-exclamation-triangle"></i> 错误码说明</h2>
+                <p>API返回的状态码和错误信息说明</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-body">
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-list"></i> 状态码说明</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>状态码</th>
+                                    <th>含义</th>
+                                    <th>可能原因</th>
+                                    <th>建议操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="status-code status-200">200</span></td>
+                                    <td>成功</td>
+                                    <td>请求成功处理</td>
+                                    <td>正常</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-code status-400">400</span></td>
+                                    <td>错误请求</td>
+                                    <td>缺少参数、参数格式错误、词条已存在</td>
+                                    <td>检查请求参数是否正确</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-code status-401">401</span></td>
+                                    <td>未授权</td>
+                                    <td>Token验证失败、缺少Token</td>
+                                    <td>检查Token是否正确，确保双重认证</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-code status-404">404</span></td>
+                                    <td>未找到</td>
+                                    <td>词条不存在、回复不存在</td>
+                                    <td>确认要操作的数据是否存在</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-code status-500">500</span></td>
+                                    <td>服务器错误</td>
+                                    <td>内部处理错误、文件系统错误</td>
+                                    <td>检查服务器日志，联系管理员</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="section">
+                        <div class="section-title"><i class="fas fa-lightbulb"></i> 常见问题</div>
+                        <div class="note warning">
+                            <i class="fas fa-exclamation-circle"></i> <strong>Token认证失败:</strong> 请确保在HTTP Header和请求体中都提供了正确的Token，Token在服务器启动时显示在控制台。
+                        </div>
+                        
+                        <div class="note">
+                            <i class="fas fa-question-circle"></i> <strong>词条查询无结果:</strong> 检查是否设置了正确的匹配模式（模糊/精确），确认关键词是否存在于词库中。
+                        </div>
+                        
+                        <div class="note info">
+                            <i class="fas fa-database"></i> <strong>数据目录权限:</strong> 如果出现文件操作错误，请检查数据目录是否有读写权限。
+                        </div>
+                        
+                        <div class="note new">
+                            <i class="fas fa-code"></i> <strong>变量替换失败:</strong> 确认提供了完整的event_data参数，检查变量格式是否正确。
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 页脚 -->
+            <div class="footer">
+                <p>© 2024 VanBot词库API | 版本 <strong>2.0.0</strong> | 最后更新: 2024-01-25</p>
+                <p style="font-size: 0.8rem; margin-top: 10px; color: #888;">
+                    访问 <a href="http://0.0.0.0:8889/docs" target="_blank">Swagger文档</a> 获取交互式API测试界面 |
+                    <a href="#new-features">查看新特性</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    // 更新导航激活状态
+                    document.querySelectorAll('.nav-links li a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // 平滑滚动
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 20,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // 页面滚动时更新导航激活状态
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.page-header');
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            
+            if (currentSection) {
+                document.querySelectorAll('.nav-links li a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + currentSection) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+        
+        // JSON语法高亮
+        function highlightJSON() {
+            document.querySelectorAll('pre code').forEach(block => {
+                let code = block.innerHTML;
+                
+                // 高亮JSON键
+                code = code.replace(/"([^"]+)"\s*:/g, '<span class="json-key">"$1"</span>:');
+                
+                // 高亮字符串
+                code = code.replace(/:\s*"([^"]*)"/g, ': <span class="json-string">"$1"</span>');
+                
+                // 高亮数字
+                code = code.replace(/:\s*(\d+)/g, ': <span class="json-number">$1</span>');
+                
+                // 高亮布尔值
+                code = code.replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>');
+                
+                // 高亮null
+                code = code.replace(/\bnull\b/g, '<span class="json-null">null</span>');
+                
+                block.innerHTML = code;
+            });
+        }
+        
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            highlightJSON();
+            
+            // 设置默认激活的导航项
+            const hash = window.location.hash;
+            if (hash) {
+                const link = document.querySelector(`.nav-links li a[href="${hash}"]`);
+                if (link) {
+                    document.querySelectorAll('.nav-links li a').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+[file content end]
